@@ -1,9 +1,18 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:tetris/GridCell.dart';
 import 'package:tetris/TetrisFigure.dart';
 import 'package:tetris/TetrisFigureInfo.dart';
+
+List<List<TetrisFigureTypes?>> gameBoard = List.generate(
+    COL_LENGTH,
+    (i) => List.generate(
+      ROW_LENGTH,
+      (j) => null,
+    ),
+);
 
 class GameBoard extends StatefulWidget
 {
@@ -38,9 +47,75 @@ class _GameBoardState extends State<GameBoard> {
         frameRate,
         (timer) {
           setState(() {
+            checkLanding();
             currentFigure.moveFigure(Direction.down);
           });
         });
+  }
+
+  bool checkCollision(Direction direction)
+  {
+    for (int i = 0; i < currentFigure.position.length; ++i)
+    {
+      int rowNumber = (currentFigure.position[i] / ROW_LENGTH).floor();
+      int colNumber = currentFigure.position[i] % ROW_LENGTH;
+
+      switch (direction)
+      {
+        case Direction.left:
+          colNumber -= 1;
+          break;
+        case Direction.right:
+          colNumber += 1;
+          break;
+        case Direction.down:
+          rowNumber += 1;
+          break;
+      }
+
+      if (rowNumber >= COL_LENGTH || colNumber < 0 || colNumber >= ROW_LENGTH)
+      {
+        return true;
+      }
+
+      if (rowNumber >= 0 && colNumber >= 0)
+      {
+        if (gameBoard[rowNumber][colNumber] != null)
+        {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  void checkLanding()
+  {
+    if (checkCollision(Direction.down))
+    {
+      for (int i = 0; i < currentFigure.position.length; ++i)
+      {
+        int rowNumber = (currentFigure.position[i] / ROW_LENGTH).floor();
+        int colNumber = currentFigure.position[i] % ROW_LENGTH;
+
+        if(rowNumber >= 0 && colNumber >= 0)
+        {
+          gameBoard[rowNumber][colNumber] = currentFigure.type;
+        }
+      }
+
+      createNewFigure();
+    }
+  }
+
+  void createNewFigure()
+  {
+    Random random = Random();
+    
+    TetrisFigureTypes randomType = TetrisFigureTypes.values[random.nextInt(TetrisFigureTypes.values.length)];
+    currentFigure = TetrisFigure(type: randomType);
+    currentFigure.initializeTetrisFigure();
   }
 
   @override
@@ -54,12 +129,19 @@ class _GameBoardState extends State<GameBoard> {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: ROW_LENGTH),
         itemBuilder: (context, index) {
+          int rowNumber = (index / ROW_LENGTH).floor();
+          int colNumber = index % ROW_LENGTH;
+          
           if (currentFigure.position.contains(index))
           {
             return GridCell(
                 color: Colors.yellow,
                 child: index
             );
+          }
+          else if (gameBoard[rowNumber][colNumber] != null)
+          {
+            return GridCell(color: Colors.pink, child: '');
           }
           else
           {
