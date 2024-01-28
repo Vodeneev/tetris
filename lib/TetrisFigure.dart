@@ -13,7 +13,37 @@ class TetrisFigure
     {
       case TetrisFigureTypes.L:
         position = [
-          4, 14, 24, 25
+          -26, -16, -6, -5
+        ];
+        break;
+      case TetrisFigureTypes.J:
+        position = [
+          -25, -15, -5, -6
+        ];
+        break;
+      case TetrisFigureTypes.I:
+        position = [
+          -4, -5, -6, -7
+        ];
+        break;
+      case TetrisFigureTypes.O:
+        position = [
+          -15, -16, -5, -6
+        ];
+        break;
+      case TetrisFigureTypes.S:
+        position = [
+          -15, -14, -6, -5
+        ];
+        break;
+      case TetrisFigureTypes.Z:
+        position = [
+          -17, -16, -6, -5
+        ];
+        break;
+      case TetrisFigureTypes.T:
+        position = [
+          -26, -16, -6, -15
         ];
         break;
 
