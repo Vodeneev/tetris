@@ -256,20 +256,18 @@ class _GameBoardState extends State<GameBoard> {
                 if (currentFigure.position.contains(index))
                 {
                   return GridCell(
-                      color: currentFigure.color,
-                      child: index
+                      color: currentFigure.color
                   );
                 }
                 else if (gameBoard[rowNumber][colNumber] != null)
                 {
                   final TetrisFigureTypes? tetrisFigureType = gameBoard[rowNumber][colNumber];
-                  return GridCell(color: tetrisFigureColors[tetrisFigureType], child: '');
+                  return GridCell(color: tetrisFigureColors[tetrisFigureType]);
                 }
                 else
                 {
                   return GridCell(
-                      color: Colors.grey[900],
-                      child: index
+                      color: Colors.grey[900]
                   );
                 }
               },
