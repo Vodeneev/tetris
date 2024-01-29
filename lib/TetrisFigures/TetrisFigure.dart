@@ -47,10 +47,9 @@ abstract class TetrisFigure
 
   bool isPositionValid(int position)
   {
-    int rowNumber = (position / GameBoard.rowLength).floor();
-    int colNumber = position % GameBoard.rowLength;
+    GameBoardPosition gameBoardPosition = GameBoard.getRowColIndexes(position);
 
-    if (rowNumber < 0 || colNumber < 0 || GameBoard.gameBoard[rowNumber][colNumber] != null)
+    if (gameBoardPosition.rowNumber < 0 || gameBoardPosition.colNumber < 0 || GameBoard.gameBoard[gameBoardPosition.rowNumber][gameBoardPosition.colNumber] != null)
     {
       return false;
     }

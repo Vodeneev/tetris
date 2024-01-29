@@ -57,30 +57,28 @@ class GameEngine
   {
     for (int i = 0; i < currentFigure.position.length; ++i)
     {
-      int rowNumber = (currentFigure.position[i] / GameBoard.rowLength).floor();
-      int colNumber = currentFigure.position[i] % GameBoard.rowLength;
-
+      GameBoardPosition gameBoardPosition = GameBoard.getRowColIndexes(currentFigure.position[i]);
       switch (direction)
       {
         case Direction.left:
-          colNumber -= 1;
+          gameBoardPosition.colNumber -= 1;
           break;
         case Direction.right:
-          colNumber += 1;
+          gameBoardPosition.colNumber += 1;
           break;
         case Direction.down:
-          rowNumber += 1;
+          gameBoardPosition.rowNumber += 1;
           break;
       }
 
-      if (rowNumber >= GameBoard.colLength || colNumber < 0 || colNumber >= GameBoard.rowLength)
+      if (gameBoardPosition.rowNumber >= GameBoard.colLength || gameBoardPosition.colNumber < 0 || gameBoardPosition.colNumber >= GameBoard.rowLength)
       {
         return true;
       }
 
-      if (rowNumber >= 0 && colNumber >= 0)
+      if (gameBoardPosition.rowNumber >= 0 && gameBoardPosition.colNumber >= 0)
       {
-        if (GameBoard.gameBoard[rowNumber][colNumber] != null)
+        if (GameBoard.gameBoard[gameBoardPosition.rowNumber][gameBoardPosition.colNumber] != null)
         {
           return true;
         }
@@ -96,12 +94,11 @@ class GameEngine
     {
       for (int i = 0; i < currentFigure.position.length; ++i)
       {
-        int rowNumber = (currentFigure.position[i] / GameBoard.rowLength).floor();
-        int colNumber = currentFigure.position[i] % GameBoard.rowLength;
+        GameBoardPosition gameBoardPosition = GameBoard.getRowColIndexes(currentFigure.position[i]);
 
-        if(rowNumber >= 0 && colNumber >= 0)
+        if(gameBoardPosition.rowNumber >= 0 && gameBoardPosition.colNumber >= 0)
         {
-          GameBoard.gameBoard[rowNumber][colNumber] = currentFigure.type;
+          GameBoard.gameBoard[gameBoardPosition.rowNumber][gameBoardPosition.colNumber] = currentFigure.type;
         }
       }
 

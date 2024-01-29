@@ -3,6 +3,14 @@ import 'package:tetris/GameEngine.dart';
 import 'package:tetris/GridCell.dart';
 import 'package:tetris/TetrisFigures/TetrisFigureInfo.dart';
 
+class GameBoardPosition
+{
+  int rowNumber;
+  int colNumber;
+
+  GameBoardPosition(this.rowNumber, this.colNumber);
+}
+
 class GameBoard extends StatefulWidget
 {
   static const int rowLength = 10;
@@ -21,6 +29,14 @@ class GameBoard extends StatefulWidget
 
   @override
   State<GameBoard> createState() => _GameBoardState();
+
+  static GameBoardPosition getRowColIndexes(int index)
+  {
+    int rowNumber = (index / GameBoard.rowLength).floor();
+    int colNumber = index % GameBoard.rowLength;
+
+    return GameBoardPosition(rowNumber, colNumber);
+  }
 }
 
 class _GameBoardState extends State<GameBoard>
@@ -112,8 +128,7 @@ class _GameBoardState extends State<GameBoard>
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: GameBoard.rowLength),
               itemBuilder: (context, index) {
-                int rowNumber = (index / GameBoard.rowLength).floor();
-                int colNumber = index % GameBoard.rowLength;
+                GameBoardPosition gameBoardPosition = GameBoard.getRowColIndexes(index);
             
                 if (gameEngine.getCurrentFigure().position.contains(index))
                 {
@@ -121,9 +136,9 @@ class _GameBoardState extends State<GameBoard>
                       color: gameEngine.getCurrentFigure().getColor()
                   );
                 }
-                else if (GameBoard.gameBoard[rowNumber][colNumber] != null)
+                else if (GameBoard.gameBoard[gameBoardPosition.rowNumber][gameBoardPosition.colNumber] != null)
                 {
-                  final TetrisFigureTypes? tetrisFigureType = GameBoard.gameBoard[rowNumber][colNumber];
+                  final TetrisFigureTypes? tetrisFigureType = GameBoard.gameBoard[gameBoardPosition.rowNumber][gameBoardPosition.colNumber];
                   return GridCell(color: tetrisFigureColors[tetrisFigureType]);
                 }
                 else
