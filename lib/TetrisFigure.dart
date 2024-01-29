@@ -47,7 +47,7 @@ class TetrisFigure
       case Direction.down:
         for (int i = 0; i < position.length; ++i)
         {
-          position[i] += ROW_LENGTH;
+          position[i] += GameBoard.rowLength;
         }
         break;
 
@@ -79,10 +79,10 @@ class TetrisFigure
         {
           case 0:
             newPosition = [
-              position[1] - ROW_LENGTH,
+              position[1] - GameBoard.rowLength,
               position[1],
-              position[1] + ROW_LENGTH,
-              position[1] + ROW_LENGTH + 1,
+              position[1] + GameBoard.rowLength,
+              position[1] + GameBoard.rowLength + 1,
             ];
 
             break;
@@ -92,24 +92,24 @@ class TetrisFigure
               position[1] - 1,
               position[1],
               position[1] + 1,
-              position[1] + ROW_LENGTH - 1,
+              position[1] + GameBoard.rowLength - 1,
             ];
 
             break;
 
           case 2:
             newPosition = [
-              position[1] + ROW_LENGTH,
+              position[1] + GameBoard.rowLength,
               position[1],
-              position[1] - ROW_LENGTH,
-              position[1] - ROW_LENGTH - 1,
+              position[1] - GameBoard.rowLength,
+              position[1] - GameBoard.rowLength - 1,
             ];
 
             break;
 
           case 3:
             newPosition = [
-              position[1] - ROW_LENGTH + 1,
+              position[1] - GameBoard.rowLength + 1,
               position[1],
               position[1] + 1,
               position[1] - 1,
@@ -141,10 +141,10 @@ class TetrisFigure
 
           case 1:
             newPosition = [
-              position[1] - ROW_LENGTH,
+              position[1] - GameBoard.rowLength,
               position[1],
-              position[1] + ROW_LENGTH,
-              position[1] + 2 * ROW_LENGTH,
+              position[1] + GameBoard.rowLength,
+              position[1] + 2 * GameBoard.rowLength,
             ];
 
             break;
@@ -161,10 +161,10 @@ class TetrisFigure
 
           case 3:
             newPosition = [
-              position[1] + ROW_LENGTH,
+              position[1] + GameBoard.rowLength,
               position[1],
-              position[1] - ROW_LENGTH,
-              position[1] - 2 * ROW_LENGTH,
+              position[1] - GameBoard.rowLength,
+              position[1] - 2 * GameBoard.rowLength,
             ];
 
             break;
@@ -186,10 +186,10 @@ class TetrisFigure
 
   bool isPositionValid(int position)
   {
-    int rowNumber = (position / ROW_LENGTH).floor();
-    int colNumber = position % ROW_LENGTH;
+    int rowNumber = (position / GameBoard.rowLength).floor();
+    int colNumber = position % GameBoard.rowLength;
 
-    if (rowNumber < 0 || colNumber < 0 || gameBoard[rowNumber][colNumber] != null)
+    if (rowNumber < 0 || colNumber < 0 || GameBoard.gameBoard[rowNumber][colNumber] != null)
     {
       return false;
     }
@@ -209,14 +209,14 @@ class TetrisFigure
         return false;
       }
 
-      int colNumber = pos % ROW_LENGTH;
+      int colNumber = pos % GameBoard.rowLength;
 
       if (colNumber == 0)
       {
         firstColOccupied = true;
       }
 
-      if (colNumber == ROW_LENGTH - 1)
+      if (colNumber == GameBoard.rowLength - 1)
       {
         lastColOccupied = true;
       }

@@ -1,81 +1,68 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:tetris/GameEngine.dart';
 import 'package:tetris/GridCell.dart';
-import 'package:tetris/TetrisFigure.dart';
 import 'package:tetris/TetrisFigureInfo.dart';
-
-List<List<TetrisFigureTypes?>> gameBoard = List.generate(
-    COL_LENGTH,
-    (i) => List.generate(
-      ROW_LENGTH,
-      (j) => null,
-    ),
-);
 
 class GameBoard extends StatefulWidget
 {
+  static const int rowLength = 10;
+  static const int colLength = 15;
+  static List<List<TetrisFigureTypes?>> gameBoard = List.generate(
+    colLength,
+        (i) => List.generate(
+          rowLength,
+            (j) => null,
+    ),
+  );
+
+  const GameBoard._privateConstructor();
+  static GameBoard instance = const GameBoard._privateConstructor();
   const GameBoard({super.key});
 
   @override
   State<GameBoard> createState() => _GameBoardState();
 }
 
-class _GameBoardState extends State<GameBoard> {
-  TetrisFigure currentFigure = TetrisFigure(type: TetrisFigureTypes.L);
-  int currentScore = 0;
-  bool gameOver = false;
+class _GameBoardState extends State<GameBoard>
+{
+  GameEngine gameEngine = GameEngine.instance;
 
   @override
   void initState()
   {
     super.initState();
 
-    startGame();
+    gameEngine.addUpdateListener(update);
+    gameEngine.addGameOverListener(showGameOverDialog);
+    gameEngine.startGame();
   }
 
-  void startGame()
+  @override
+  void dispose() {
+    gameEngine.removeUpdateListener(update);
+    gameEngine.removeGameOverListener(showGameOverDialog);
+    super.dispose();
+  }
+
+  void update()
   {
-    currentFigure.initializeTetrisFigure();
-
-    Duration frameRate = const Duration(milliseconds: 400);
-    gameLoop(frameRate);
+    setState(() { });
   }
 
-  void gameLoop(Duration frameRate)
-  {
-    Timer.periodic(
-        frameRate,
-        (timer) {
-          setState(() {
-            disappearLines();
-            checkLanding();
-            if (gameOver == true)
-            {
-              timer.cancel();
-              showGameOverDialog();
-            }
-
-            currentFigure.moveFigure(Direction.down);
-          });
-        });
-  }
-  
   void showGameOverDialog()
   {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Game over'),
-        content: Text("Your score is: $currentScore"),
+        title: const Text('Game over'),
+        content: Text("Your score is: ${gameEngine.currentScore}"),
         actions: [
           TextButton(
           onPressed: () {
             resetGame();
             Navigator.pop(context);
           },
-          child: Text('Play again'))
+          child: const Text('Play again'))
         ],
       )
     );
@@ -83,107 +70,23 @@ class _GameBoardState extends State<GameBoard> {
 
   void resetGame()
   {
-    gameBoard = List.generate(
-      COL_LENGTH,
+    GameBoard.gameBoard = List.generate(
+      GameBoard.colLength,
           (i) => List.generate(
-        ROW_LENGTH,
+        GameBoard.rowLength,
             (j) => null,
       ),
     );
 
-    gameOver = false;
-    currentScore = 0;
-
-    createNewFigure();
-    startGame();
+    gameEngine.startGame();
   }
 
-  bool checkCollision(Direction direction)
+  void moveFigure(Direction direction)
   {
-    for (int i = 0; i < currentFigure.position.length; ++i)
-    {
-      int rowNumber = (currentFigure.position[i] / ROW_LENGTH).floor();
-      int colNumber = currentFigure.position[i] % ROW_LENGTH;
-
-      switch (direction)
-      {
-        case Direction.left:
-          colNumber -= 1;
-          break;
-        case Direction.right:
-          colNumber += 1;
-          break;
-        case Direction.down:
-          rowNumber += 1;
-          break;
-      }
-
-      if (rowNumber >= COL_LENGTH || colNumber < 0 || colNumber >= ROW_LENGTH)
-      {
-        return true;
-      }
-
-      if (rowNumber >= 0 && colNumber >= 0)
-      {
-        if (gameBoard[rowNumber][colNumber] != null)
-        {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  void checkLanding()
-  {
-    if (checkCollision(Direction.down))
-    {
-      for (int i = 0; i < currentFigure.position.length; ++i)
-      {
-        int rowNumber = (currentFigure.position[i] / ROW_LENGTH).floor();
-        int colNumber = currentFigure.position[i] % ROW_LENGTH;
-
-        if(rowNumber >= 0 && colNumber >= 0)
-        {
-          gameBoard[rowNumber][colNumber] = currentFigure.type;
-        }
-      }
-
-      createNewFigure();
-    }
-  }
-
-  void createNewFigure()
-  {
-    Random random = Random();
-    
-    TetrisFigureTypes randomType = TetrisFigureTypes.values[random.nextInt(TetrisFigureTypes.values.length)];
-    currentFigure = TetrisFigure(type: randomType);
-    currentFigure.initializeTetrisFigure();
-
-    if (isGameOver())
-    {
-      gameOver = true;
-    }
-  }
-
-  void moveLeft()
-  {
-    if (!checkCollision(Direction.left))
+    if (!gameEngine.checkCollision(direction))
     {
       setState(() {
-        currentFigure.moveFigure(Direction.left);
-      });
-    }
-  }
-
-  void moveRight()
-  {
-    if (!checkCollision(Direction.right))
-    {
-      setState(() {
-        currentFigure.moveFigure(Direction.right);
+        gameEngine.getCurrentFigure().moveFigure(direction);
       });
     }
   }
@@ -191,49 +94,8 @@ class _GameBoardState extends State<GameBoard> {
   void rotateFigure()
   {
     setState(() {
-      currentFigure.rotate();
+      gameEngine.getCurrentFigure().rotate();
     });
-  }
-
-  disappearLines()
-  {
-    for (int row = COL_LENGTH - 1; row >= 0; --row)
-    {
-      bool rowIsFull = true;
-
-      for (int col = 0; col < ROW_LENGTH; ++col)
-      {
-        if (gameBoard[row][col] == null)
-        {
-          rowIsFull = false;
-          break;
-        }
-      }
-
-      if (rowIsFull)
-      {
-        for (int r = row; r > 0; --r)
-        {
-          gameBoard[r] = List.from(gameBoard[r - 1]);
-        }
-
-        gameBoard[0] = List.generate(row, (index) => null);
-        ++currentScore;
-      }
-    }
-  }
-
-  bool isGameOver()
-  {
-    for (int col = 0; col < ROW_LENGTH; ++col)
-    {
-      if (gameBoard[0][col] != null)
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   @override
@@ -245,23 +107,23 @@ class _GameBoardState extends State<GameBoard> {
         children: [
           Expanded(
             child: GridView.builder(
-              itemCount: ROW_LENGTH * COL_LENGTH,
+              itemCount: GameBoard.rowLength * GameBoard.colLength,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: ROW_LENGTH),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: GameBoard.rowLength),
               itemBuilder: (context, index) {
-                int rowNumber = (index / ROW_LENGTH).floor();
-                int colNumber = index % ROW_LENGTH;
+                int rowNumber = (index / GameBoard.rowLength).floor();
+                int colNumber = index % GameBoard.rowLength;
             
-                if (currentFigure.position.contains(index))
+                if (gameEngine.getCurrentFigure().position.contains(index))
                 {
                   return GridCell(
-                      color: currentFigure.color
+                      color: gameEngine.getCurrentFigure().color
                   );
                 }
-                else if (gameBoard[rowNumber][colNumber] != null)
+                else if (GameBoard.gameBoard[rowNumber][colNumber] != null)
                 {
-                  final TetrisFigureTypes? tetrisFigureType = gameBoard[rowNumber][colNumber];
+                  final TetrisFigureTypes? tetrisFigureType = GameBoard.gameBoard[rowNumber][colNumber];
                   return GridCell(color: tetrisFigureColors[tetrisFigureType]);
                 }
                 else
@@ -275,8 +137,8 @@ class _GameBoardState extends State<GameBoard> {
           ),
 
           Text(
-            'Score: $currentScore',
-            style: TextStyle(color: Colors.white),
+            'Score: ${gameEngine.currentScore}',
+            style: const TextStyle(color: Colors.white),
           ),
 
           Padding(
@@ -286,19 +148,19 @@ class _GameBoardState extends State<GameBoard> {
               children: [
                 //left
                 IconButton(
-                  onPressed: moveLeft,
+                  onPressed: () { moveFigure(Direction.left); },
                   color: Colors.white,
-                  icon: Icon(Icons.arrow_back_ios_new)),
+                  icon: const Icon(Icons.arrow_back_ios_new)),
                 //rotate
                 IconButton(
                   onPressed: rotateFigure,
                   color: Colors.white,
-                  icon: Icon(Icons.rotate_right)),
+                  icon: const Icon(Icons.rotate_right)),
                 //right
                 IconButton(
-                  onPressed: moveRight,
+                  onPressed: () { moveFigure(Direction.right); },
                   color: Colors.white,
-                  icon: Icon(Icons.arrow_forward_ios),
+                  icon: const Icon(Icons.arrow_forward_ios),
                 ),
               ],
             ),
