@@ -25,6 +25,7 @@ class GameBoard extends StatefulWidget
 class _GameBoardState extends State<GameBoard> {
   TetrisFigure currentFigure = TetrisFigure(type: TetrisFigureTypes.L);
   int currentScore = 0;
+  bool gameOver = false;
 
   @override
   void initState()
@@ -50,9 +51,51 @@ class _GameBoardState extends State<GameBoard> {
           setState(() {
             disappearLines();
             checkLanding();
+            if (gameOver == true)
+            {
+              timer.cancel();
+              showGameOverDialog();
+            }
+
             currentFigure.moveFigure(Direction.down);
           });
         });
+  }
+  
+  void showGameOverDialog()
+  {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Game over'),
+        content: Text("Your score is: $currentScore"),
+        actions: [
+          TextButton(
+          onPressed: () {
+            resetGame();
+            Navigator.pop(context);
+          },
+          child: Text('Play again'))
+        ],
+      )
+    );
+  }
+
+  void resetGame()
+  {
+    gameBoard = List.generate(
+      COL_LENGTH,
+          (i) => List.generate(
+        ROW_LENGTH,
+            (j) => null,
+      ),
+    );
+
+    gameOver = false;
+    currentScore = 0;
+
+    createNewFigure();
+    startGame();
   }
 
   bool checkCollision(Direction direction)
@@ -118,6 +161,11 @@ class _GameBoardState extends State<GameBoard> {
     TetrisFigureTypes randomType = TetrisFigureTypes.values[random.nextInt(TetrisFigureTypes.values.length)];
     currentFigure = TetrisFigure(type: randomType);
     currentFigure.initializeTetrisFigure();
+
+    if (isGameOver())
+    {
+      gameOver = true;
+    }
   }
 
   void moveLeft()
@@ -173,6 +221,19 @@ class _GameBoardState extends State<GameBoard> {
         ++currentScore;
       }
     }
+  }
+
+  bool isGameOver()
+  {
+    for (int col = 0; col < ROW_LENGTH; ++col)
+    {
+      if (gameBoard[0][col] != null)
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
