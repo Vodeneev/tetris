@@ -118,41 +118,99 @@ class _GameBoardState extends State<GameBoard> {
     currentFigure.initializeTetrisFigure();
   }
 
+  void moveLeft()
+  {
+    if (!checkCollision(Direction.left))
+    {
+      setState(() {
+        currentFigure.moveFigure(Direction.left);
+      });
+    }
+  }
+
+  void moveRight()
+  {
+    if (!checkCollision(Direction.right))
+    {
+      setState(() {
+        currentFigure.moveFigure(Direction.right);
+      });
+    }
+  }
+
+  void rotateFigure()
+  {
+    setState(() {
+      currentFigure.rotate();
+    });
+  }
+
   @override
   Widget build(BuildContext context)
   {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GridView.builder(
-        itemCount: ROW_LENGTH * COL_LENGTH,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: ROW_LENGTH),
-        itemBuilder: (context, index) {
-          int rowNumber = (index / ROW_LENGTH).floor();
-          int colNumber = index % ROW_LENGTH;
-          
-          if (currentFigure.position.contains(index))
-          {
-            return GridCell(
-                color: currentFigure.color,
-                child: index
-            );
-          }
-          else if (gameBoard[rowNumber][colNumber] != null)
-          {
-            final TetrisFigureTypes? tetrisFigureType = gameBoard[rowNumber][colNumber];
-            return GridCell(color: tetrisFigureColors[tetrisFigureType], child: '');
-          }
-          else
-          {
-            return GridCell(
-                color: Colors.grey[900],
-                child: index
-            );
-          }
-        },
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              itemCount: ROW_LENGTH * COL_LENGTH,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: ROW_LENGTH),
+              itemBuilder: (context, index) {
+                int rowNumber = (index / ROW_LENGTH).floor();
+                int colNumber = index % ROW_LENGTH;
+            
+                if (currentFigure.position.contains(index))
+                {
+                  return GridCell(
+                      color: currentFigure.color,
+                      child: index
+                  );
+                }
+                else if (gameBoard[rowNumber][colNumber] != null)
+                {
+                  final TetrisFigureTypes? tetrisFigureType = gameBoard[rowNumber][colNumber];
+                  return GridCell(color: tetrisFigureColors[tetrisFigureType], child: '');
+                }
+                else
+                {
+                  return GridCell(
+                      color: Colors.grey[900],
+                      child: index
+                  );
+                }
+              },
+              ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                //left
+                IconButton(
+                  onPressed: moveLeft,
+                  color: Colors.white,
+                  icon: Icon(Icons.arrow_back_ios_new)),
+                //rotate
+                IconButton(
+                  onPressed: rotateFigure,
+                  color: Colors.white,
+                  icon: Icon(Icons.rotate_right)),
+                //right
+                IconButton(
+                  onPressed: moveRight,
+                  color: Colors.white,
+                  icon: Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

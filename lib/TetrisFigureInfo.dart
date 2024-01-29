@@ -15,20 +15,12 @@ enum Direction {
 enum TetrisFigureTypes
 {
   L,
-  J,
   I,
   O,
-  S,
-  Z,
-  T,
 }
 
 const Map<TetrisFigureTypes, Color> tetrisFigureColors = {
   TetrisFigureTypes.L: Colors.orange,
-  TetrisFigureTypes.J: Colors.blue,
-  TetrisFigureTypes.I: Colors.pink,
-  TetrisFigureTypes.O: Colors.yellow,
-  TetrisFigureTypes.S: Colors.green,
-  TetrisFigureTypes.Z: Colors.red,
-  TetrisFigureTypes.T: Colors.purple,
+  TetrisFigureTypes.I: Colors.green,
+  TetrisFigureTypes.O: Colors.blue,
 };
