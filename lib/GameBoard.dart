@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tetris/GameEngine.dart';
 import 'package:tetris/GridCell.dart';
-import 'package:tetris/TetrisFigureInfo.dart';
+import 'package:tetris/TetrisFigures/TetrisFigureInfo.dart';
 
 class GameBoard extends StatefulWidget
 {
@@ -118,7 +118,7 @@ class _GameBoardState extends State<GameBoard>
                 if (gameEngine.getCurrentFigure().position.contains(index))
                 {
                   return GridCell(
-                      color: gameEngine.getCurrentFigure().color
+                      color: gameEngine.getCurrentFigure().getColor()
                   );
                 }
                 else if (GameBoard.gameBoard[rowNumber][colNumber] != null)

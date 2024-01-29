@@ -3,12 +3,15 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:tetris/GameBoard.dart';
-import 'package:tetris/TetrisFigure.dart';
-import 'package:tetris/TetrisFigureInfo.dart';
+import 'package:tetris/TetrisFigures/LTetrisFigure.dart';
+import 'package:tetris/TetrisFigures/TetrisFigure.dart';
+import 'package:tetris/TetrisFigures/TetrisFigureFactory.dart';
+import 'package:tetris/TetrisFigures/TetrisFigureInfo.dart';
 
 class GameEngine
 {
-  TetrisFigure currentFigure = TetrisFigure(type: TetrisFigureTypes.L);
+  TetrisFigureFactory tetrisFigureFactory = TetrisFigureFactory();
+  TetrisFigure currentFigure = LTetrisFigure();
   int currentScore = 0;
   bool gameOver = false;
 
@@ -111,7 +114,7 @@ class GameEngine
     Random random = Random();
 
     TetrisFigureTypes randomType = TetrisFigureTypes.values[random.nextInt(TetrisFigureTypes.values.length)];
-    currentFigure = TetrisFigure(type: randomType);
+    currentFigure = tetrisFigureFactory.createTetrisFigure(randomType);
     currentFigure.initializeTetrisFigure();
 
     if (instance.isGameOver())
