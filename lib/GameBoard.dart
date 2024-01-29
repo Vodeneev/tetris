@@ -24,6 +24,7 @@ class GameBoard extends StatefulWidget
 
 class _GameBoardState extends State<GameBoard> {
   TetrisFigure currentFigure = TetrisFigure(type: TetrisFigureTypes.L);
+  int currentScore = 0;
 
   @override
   void initState()
@@ -47,6 +48,7 @@ class _GameBoardState extends State<GameBoard> {
         frameRate,
         (timer) {
           setState(() {
+            disappearLines();
             checkLanding();
             currentFigure.moveFigure(Direction.down);
           });
@@ -145,6 +147,34 @@ class _GameBoardState extends State<GameBoard> {
     });
   }
 
+  disappearLines()
+  {
+    for (int row = COL_LENGTH - 1; row >= 0; --row)
+    {
+      bool rowIsFull = true;
+
+      for (int col = 0; col < ROW_LENGTH; ++col)
+      {
+        if (gameBoard[row][col] == null)
+        {
+          rowIsFull = false;
+          break;
+        }
+      }
+
+      if (rowIsFull)
+      {
+        for (int r = row; r > 0; --r)
+        {
+          gameBoard[r] = List.from(gameBoard[r - 1]);
+        }
+
+        gameBoard[0] = List.generate(row, (index) => null);
+        ++currentScore;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context)
   {
@@ -185,8 +215,13 @@ class _GameBoardState extends State<GameBoard> {
               ),
           ),
 
+          Text(
+            'Score: $currentScore',
+            style: TextStyle(color: Colors.white),
+          ),
+
           Padding(
-            padding: const EdgeInsets.only(bottom: 50.0),
+            padding: const EdgeInsets.only(bottom: 50.0, top: 50),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
