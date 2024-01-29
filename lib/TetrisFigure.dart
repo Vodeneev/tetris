@@ -1,9 +1,16 @@
+import 'package:flutter/material.dart';
+
 import 'TetrisFigureInfo.dart';
 
 class TetrisFigure
 {
   TetrisFigureTypes type;
   List<int> position = [];
+
+  Color get color
+  {
+    return tetrisFigureColors[type] ?? Colors.white;
+  }
 
   TetrisFigure({required this.type});
 
