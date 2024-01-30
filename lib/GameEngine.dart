@@ -2,32 +2,39 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:tetris/GameBoard.dart';
 import 'package:tetris/TetrisFigures/LTetrisFigure.dart';
 import 'package:tetris/TetrisFigures/TetrisFigure.dart';
 import 'package:tetris/TetrisFigures/TetrisFigureFactory.dart';
 import 'package:tetris/TetrisFigures/TetrisFigureInfo.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class GameEngine
 {
   TetrisFigureFactory tetrisFigureFactory = TetrisFigureFactory();
   TetrisFigure currentFigure = LTetrisFigure();
   int currentScore = 0;
+  int highScore = 0;
   bool gameOver = false;
 
   List<VoidCallback> updateListeners = [];
   List<VoidCallback> gameOverListeners = [];
+
+  DatabaseReference? databaseReference;
 
   GameEngine._privateConstructor();
   static GameEngine instance = GameEngine._privateConstructor();
 
   void startGame()
   {
+    initializeDatabase();
     currentFigure.initializeTetrisFigure();
 
     gameOver = false;
-    currentScore = 0;
 
+    initializeScores();
     createNewFigure();
 
     Duration frameRate = const Duration(milliseconds: 400);
@@ -144,6 +151,15 @@ class GameEngine
 
         GameBoard.gameBoard[0] = List.generate(row, (index) => null);
         ++currentScore;
+
+        if (currentScore > highScore)
+        {
+          highScore = currentScore;
+          databaseReference?.child('highScore').child("0").update({
+            'key': '0',
+            'highScore': highScore,
+          });
+        }
       }
     }
   }
@@ -173,6 +189,16 @@ class GameEngine
   TetrisFigure getCurrentFigure()
   {
     return currentFigure;
+  }
+
+  int getCurrentScore()
+  {
+    return currentScore;
+  }
+
+  int getHighScore()
+  {
+    return highScore;
   }
 
   void addUpdateListener(VoidCallback listener) {
@@ -205,5 +231,22 @@ class GameEngine
     }
   }
 
+  void initializeDatabase()
+  {
+    Firebase.initializeApp();
+    databaseReference = FirebaseDatabase.instance.reference();
+  }
+
+  void initializeScores()
+  {
+    currentScore = 0;
+
+    databaseReference?.child('highScore').child("0").once().then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key, value) {
+        highScore = value;
+      });
+    });
+  }
 
 }

@@ -71,7 +71,8 @@ class _GameBoardState extends State<GameBoard>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Game over'),
-        content: Text("Your score is: ${gameEngine.currentScore}"),
+        content: Text("Your score is: ${gameEngine.getCurrentScore()}. "
+            "Your HighScore is: ${gameEngine.getHighScore()}."),
         actions: [
           TextButton(
           onPressed: () {
@@ -152,7 +153,12 @@ class _GameBoardState extends State<GameBoard>
           ),
 
           Text(
-            'Score: ${gameEngine.currentScore}',
+            'Score: ${gameEngine.getCurrentScore()}',
+            style: const TextStyle(color: Colors.white),
+          ),
+
+          Text(
+            'HighScore: ${gameEngine.getHighScore()}',
             style: const TextStyle(color: Colors.white),
           ),
 
