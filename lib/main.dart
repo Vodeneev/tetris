@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetris/StartPage.dart';
 
 import 'GameBoard.dart';
 
@@ -16,7 +17,11 @@ class TetrisApp extends StatelessWidget
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-          home: GameBoard()
-        );
+        initialRoute: '/',
+        routes:{
+          '/': (context) => const StartPage(),
+          '/game': (context) => const GameBoard(),
+        },
+    );
   }
 }
