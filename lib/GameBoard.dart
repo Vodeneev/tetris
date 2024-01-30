@@ -163,7 +163,7 @@ class _GameBoardState extends State<GameBoard>
           ),
 
           Padding(
-            padding: const EdgeInsets.only(bottom: 50.0, top: 50),
+            padding: const EdgeInsets.only(bottom: 50.0, top: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

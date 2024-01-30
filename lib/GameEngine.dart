@@ -35,6 +35,8 @@ class GameEngine
     gameOver = false;
 
     initializeScores();
+    notifyUpdateListeners();
+
     createNewFigure();
 
     Duration frameRate = const Duration(milliseconds: 400);
